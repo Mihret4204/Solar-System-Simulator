@@ -2,7 +2,7 @@
 SolarSystem: authoritative scene graph for the simulation.
 """
 
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 from models.planet import Planet
 from models.moon import Moon
@@ -99,3 +99,11 @@ class SolarSystem:
         self.elapsed_time += delta_time
         for planet in self.planets:
             planet.update(delta_time)
+
+    def find_planet(self, name: str) -> Optional[Planet]:
+        """Case insensitive planet lookup by name."""
+        target = name.lower()
+        for planet in self.planets:
+            if planet.name.lower() == target:
+                return planet
+        return None
