@@ -5,6 +5,7 @@ SolarSystem: authoritative scene graph for the simulation.
 from typing import List, Tuple
 
 from models.planet import Planet
+from models.moon import Moon
 
 try:
     from OpenGL.GL import (
@@ -65,6 +66,7 @@ class SolarSystem:
     def __init__(self) -> None:
         self.sun: Sun = Sun()
         self.planets: List[Planet] = []
+        self.elapsed_time: float = 0.0
         self._build_scene()
 
     def _build_scene(self) -> None:
@@ -80,4 +82,20 @@ class SolarSystem:
                 rotation_speed=rot_spd,
                 tilt=tilt,
             )
+            if name == "Earth":
+                planet.add_moon(Moon(
+                    name="Luna",
+                    radius=0.15,
+                    distance_from_planet=1.2,
+                    color=(0.80, 0.80, 0.78),
+                    orbit_speed=130.0,
+                    rotation_speed=130.0,
+                    orbit_inclination=5.1,
+                ))
             self.planets.append(planet)
+
+    def update(self, delta_time: float) -> None:
+        """Advance simulation clock and update every body."""
+        self.elapsed_time += delta_time
+        for planet in self.planets:
+            planet.update(delta_time)
