@@ -67,3 +67,34 @@ class TransformationNode:
             child.traverse_and_render(rendering_callback)
 
         glPopMatrix()
+
+
+def build_simulation_hierarchy(solar_system) -> TransformationNode:
+    # Root node positioned at the Sun
+    root = TransformationNode("Sun")
+    
+    for planet in solar_system.planets:
+        planet_node = TransformationNode(planet.name)
+        
+        #Translate space by the planet's orbital sweep angle, then move outward
+        planet_node.add_rotation(planet.orbit_angle, 0.0, 1.0, 0.0)
+        planet_node.set_translation(planet.distance_from_sun, 0.0, 0.0)
+        
+        #Apply axial tilt and self-rotation
+        planet_node.add_rotation(planet.tilt, 0.0, 0.0, 1.0)
+        planet_node.add_rotation(planet.rotation_angle, 0.0, 1.0, 0.0)
+        
+        #Add moons relative to this planet
+        for moon in planet.moons:
+            moon_node = TransformationNode(moon.name)
+            # Moons tilt, orbit their parent, and translate outward
+            moon_node.add_rotation(moon.orbit_inclination, 1.0, 0.0, 0.0)
+            moon_node.add_rotation(moon.orbit_angle, 0.0, 1.0, 0.0)
+            moon_node.set_translation(moon.distance_from_planet, 0.0, 0.0)
+            moon_node.add_rotation(moon.rotation_angle, 0.0, 1.0, 0.0)
+            
+            planet_node.add_child(moon_node)
+            
+        root.add_child(planet_node)
+        
+    return root
