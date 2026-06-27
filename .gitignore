@@ -1,0 +1,4 @@
+# Ignore PyCharm IDE configurations and caches
+.idea/
+*.pyc
+__pycache__/
